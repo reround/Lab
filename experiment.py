@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 '''
-@File    :   Radar.py
+@File    :   experiment.py
 @Time    :   2023/07/17 15:11
 @Author  :   shun
 @Description  :   TODO
@@ -148,7 +148,9 @@ class Target():
     目标类，定义了目标相关参数
     """
 
-    def __init__(self, distance=[40], sigma=0.1) -> None:
+    def __init__(self, 
+                 distance=[40],
+                 sigma=0.1) -> None:
         """
         初始化
 
@@ -158,6 +160,17 @@ class Target():
         self.distance = distance
         self.sigma = sigma
         self.RCS = 10 * np.log10(self.sigma)
+
+
+def Maximum_coherent_accumulation_time_limit(lambda_, a_r):
+    """
+    最大相干积累时间限制
+
+    :param _type_ lambda_: 激光波长
+    :param _type_ a_r: 目标径向加速度
+    """
+    return np.sqrt(lambda_ / (2 * a_r))
+
 
 
 if __name__ == '__main__':

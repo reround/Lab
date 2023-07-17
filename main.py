@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from Radar import Radar, Target
+from experiment import Radar, Target
 
 
 radar = Radar(theta_a=3,T_sc=8)
