@@ -9,6 +9,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+from tools import fig_font_size
 
 from constant import *
 
@@ -142,8 +143,8 @@ class Radar():
         PAP = SNR + four_pi + k_db + self.T_e_db + self.F + self.L + range_pwr4_db + self.omega_db - Sigma - self.T_sc
         return PAP
     
-    # @fig_ui
-    def draw(self, title="LFM fft"):
+    @fig_font_size
+    def draw(self):
         t_x = np.linspace(-self.T_c/2., self.T_c/2., 10001)
         mu = 2 * np.pi * self.slope
         # 计算复数形式 LFM 的波形
@@ -156,7 +157,9 @@ class Radar():
         LFM_fft = np.fft.fftshift(np.fft.fft(LFM))
         
         # 绘图
+
         plt.plot(abs(LFM_fft))
+        plt.title("LFM fft")
         plt.show()
 
 class Pulsed_lidar(Radar):

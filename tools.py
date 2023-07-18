@@ -6,8 +6,11 @@
 @Author  :   shun
 @Description  :   TODO
 '''
+from matplotlib import pyplot as plt
 import numpy as np
 import scipy
+
+
 
 def find_heighest_peak(sequence: list) -> tuple:
     """
@@ -27,6 +30,27 @@ def find_heighest_peak(sequence: list) -> tuple:
     # 返回最大峰值索引和最大峰值
     return (max_index, max_value)
 
+
+def fig_font_size(func):
+    """
+    设置 matplotlib 绘图样式的装饰器，只会进行样式的设置，并不会绘图。
+    原理是进行全局设置样式。
+
+    :param _type_ func: 被装饰函数
+    """
+    def inner(*args, **kwargs):
+        # 设置字体样式
+        plt.rcParams['font.sans-serif'] = "Consolas"
+        # 设置字体大小
+        plt.rcParams['font.size'] = 24
+        # 设置刻度向内
+        plt.tick_params(axis='both', direction='in')
+        # 添加刻度
+        plt.grid()
+        
+        func(*args, **kwargs)
+    
+    return inner
     
 
 
