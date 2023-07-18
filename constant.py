@@ -6,6 +6,7 @@
 @Author  :   shun
 @Description  :   TODO
 '''
+import numpy as np
 
 # 光速
 c = 3.0e+8

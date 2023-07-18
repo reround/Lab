@@ -6,7 +6,8 @@
 @Author  :   shun
 @Description  :   TODO
 '''
-import matplotlib.pyplot as plt
+import numpy as np
+import scipy
 
 def find_heighest_peak(sequence: list) -> tuple:
     """

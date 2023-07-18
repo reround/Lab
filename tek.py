@@ -6,6 +6,7 @@
 @Author  :   shun
 @Description  :   针对 Tek 示波器文件的类
 '''
+import numpy as np
 
 class Tek(object):
     """
