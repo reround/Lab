@@ -49,3 +49,15 @@ sigma=0.1
 ```python
 Maximum_coherent_accumulation_time_limit(lambda_, a_r)
 ```
+
+# constant.py
+
+一些常数
+
+# tek.py
+
+针对 Tek 示波器文件的类
+
+# tools.py
+
+一些工具函数

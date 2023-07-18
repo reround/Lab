@@ -3,8 +3,7 @@ import matplotlib.pyplot as plt
 
 from experiment import Radar, Target
 
-
-radar = Radar(theta_a=3,T_sc=8)
+radar = Radar(B=200.0e6, theta_a=3, T_sc=8)
 # dis = np.arange(10, 100, 10)
 # target = Target(distance=dis)
 # # target
@@ -13,6 +12,6 @@ radar = Radar(theta_a=3,T_sc=8)
 
 # plt.plot(snr)
 # plt.show()
-print(radar.f_r)
-print(radar.n_p)
-
+print(radar.B)
+print(radar.T_c)
+radar.draw()

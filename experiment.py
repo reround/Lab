@@ -8,14 +8,9 @@
 '''
 
 import numpy as np
+import matplotlib.pyplot as plt
 
-# 光速
-c = 3.0e+8
-# 玻尔兹曼常数
-k = 1.38e-23
-# 转换玻尔兹曼常数到 dB
-k_db = 10 * np.log10(k)
-
+from constant import *
 
 class Radar():
     """
@@ -31,6 +26,7 @@ class Radar():
                  L=6,
                  F=3,
                  B=5e6,
+                 T_c=10e-6,
                  theta_e=1,
                  theta_a=1,
                  Theta_E=1,
@@ -49,6 +45,7 @@ class Radar():
         :param int L: 雷达损失 dB, defaults to 6
         :param int F: 噪声系数 dB, defaults to 3
         :param _type_ B: 带宽 Hz, defaults to 5e6
+        :param _type_ T_c: 调制周期 s, defaults to 10.e-6
         :param int theta_e: 俯仰角 °, 为角度制, defaults to 1
         :param int theta_a: 方位角 °, 为角度制, defaults to 1
         :param int Theta_E: 搜索俯仰角 °, 为角度制, defaults to 1
@@ -65,6 +62,7 @@ class Radar():
         self.L = L
         self.F = F
         self.B = B
+        self.T_c = T_c
         self.theta_e = theta_e
         self.theta_a = theta_a
         self.Theta_E = Theta_E
@@ -79,6 +77,8 @@ class Radar():
         # 目标反射脉冲数
         self.n_p = (
             (self.theta_a / 57.296) * self.T_sc * self.f_r) / (2 * np.pi)
+        # 调制斜率
+        self.slope = self.B / self.T_c
 
         # 搜索立体角
         self.Omega = self.Theta_E * self.Theta_A / (57.296**2)
@@ -141,6 +141,30 @@ class Radar():
         range_pwr4_db = 10 * np.log10(np.power(r, 4))
         PAP = SNR + four_pi + k_db + self.T_e_db + self.F + self.L + range_pwr4_db + self.omega_db - Sigma - self.T_sc
         return PAP
+    
+    # @fig_ui
+    def draw(self, title="LFM fft"):
+        t_x = np.linspace(-self.T_c/2., self.T_c/2., 10001)
+        mu = 2 * np.pi * self.slope
+        # 计算复数形式 LFM 的波形
+        Ichannal = np.cos(mu * np.power(t_x, 2) / 2.) # 实部
+        Qchannal = np.sin(mu * np.power(t_x, 2) / 2.) # 虚部
+        # 合成 LFM 
+        LFM = Ichannal + 1j * Qchannal
+        
+        # 计算 LFM 的傅里叶变换
+        LFM_fft = np.fft.fftshift(np.fft.fft(LFM))
+        
+        # 绘图
+        plt.plot(abs(LFM_fft))
+        plt.show()
+
+class Pulsed_lidar(Radar):
+    pass
+
+
+class Coherent_lidar(Radar):
+    pass
 
 
 class Target():
@@ -148,9 +172,7 @@ class Target():
     目标类，定义了目标相关参数
     """
 
-    def __init__(self, 
-                 distance=[40],
-                 sigma=0.1) -> None:
+    def __init__(self, distance=[40], sigma=0.1) -> None:
         """
         初始化
 
@@ -170,7 +192,6 @@ def Maximum_coherent_accumulation_time_limit(lambda_, a_r):
     :param _type_ a_r: 目标径向加速度
     """
     return np.sqrt(lambda_ / (2 * a_r))
-
 
 
 if __name__ == '__main__':
