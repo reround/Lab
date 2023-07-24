@@ -1,10 +1,12 @@
 # Lab
 
-# experiment.py
+This project simulates a radar system
 
-## 类
+# 1 experiment.py
 
-### Radar 类
+## 1.1 类
+
+### 1.1.1 Radar 类
 
 #### 属性
 
@@ -34,7 +36,7 @@ get_PD(self, R: float)
 compute_SNR(self, sigma, r)
 compute_PAP(self, SNR, sigma, r)
 ```
-### Targe 类
+### 1.1.2 Targe 类
 
 #### 属性
 
@@ -44,20 +46,20 @@ sigma=0.1
 ```
 #### 方法
 
-## 函数
+## 1.2 函数
 
 ```python
 Maximum_coherent_accumulation_time_limit(lambda_, a_r)
 ```
 
-# constant.py
+# 2 constant.py
 
 一些常数
 
-# tek.py
+# 3 tek.py
 
 针对 Tek 示波器文件的类
 
-# tools.py
+# 4 tools.py
 
 一些工具函数

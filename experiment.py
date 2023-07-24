@@ -13,7 +13,8 @@ from tools import fig_font_size
 
 from constant import *
 
-class Radar():
+
+class Radar:
     """
     雷达类，定义了雷达相关参数
     """
@@ -142,25 +143,64 @@ class Radar():
         range_pwr4_db = 10 * np.log10(np.power(r, 4))
         PAP = SNR + four_pi + k_db + self.T_e_db + self.F + self.L + range_pwr4_db + self.omega_db - Sigma - self.T_sc
         return PAP
-    
-    @fig_font_size
-    def draw(self):
-        t_x = np.linspace(-self.T_c/2., self.T_c/2., 10001)
-        mu = 2 * np.pi * self.slope
-        # 计算复数形式 LFM 的波形
-        Ichannal = np.cos(mu * np.power(t_x, 2) / 2.) # 实部
-        Qchannal = np.sin(mu * np.power(t_x, 2) / 2.) # 虚部
-        # 合成 LFM 
-        LFM = Ichannal + 1j * Qchannal
+
+    def chirp(self, sweep="up"):
+        """
+        返回合成的 LFM
+
+        :return _type_: 时间 : t_x 和 波形 : LFM
+        """
+        def LFM(t_x):
+            mu = 2 * np.pi * self.slope
+            # 计算复数形式 LFM 的波形
+            Ichannal = np.cos(mu * np.power(t_x, 2) / 2.)  # 实部
+            Qchannal = np.sin(mu * np.power(t_x, 2) / 2.)  # 虚部
+            # 返回合成 LFM
+            return t_x, Ichannal + 1j * Qchannal
         
+        # 上扫频
+        if sweep=="up":
+            print(sweep)
+            return LFM(np.linspace(0, self.T_c, 10001))
+            
+        # 下扫频
+        elif sweep=="down":
+            print(sweep)
+            return LFM(np.linspace(-self.T_c, 0, 10001))
+
+        # 三角扫频
+        elif sweep=="triangle":
+            print(sweep)
+            t_x_fore = np.linspace(0, self.T_c/2.0, 5001)
+            t_x_behind = np.linspace(-self.T_c/2.0, 0, 5000)
+            t_x = np.hstack([t_x_behind, t_x_fore])
+            _, fore = LFM(t_x_fore)
+            _, behind = LFM(t_x_behind)
+            return t_x, np.hstack([fore, behind])
+        else:
+            raise Exception("The sweep mode is not exist.")
+        
+        
+    def draw(self):
+        # 设置字体样式
+        plt.rcParams['font.sans-serif'] = "Consolas"
+        # 设置字体大小
+        plt.rcParams['font.size'] = 24
+        # 设置刻度向内
+        plt.tick_params(axis='both', direction='in')
+        # 添加刻度
+        plt.grid()
+        
+        LFM = self.chirp()
         # 计算 LFM 的傅里叶变换
         LFM_fft = np.fft.fftshift(np.fft.fft(LFM))
-        
+
         # 绘图
 
         plt.plot(abs(LFM_fft))
         plt.title("LFM fft")
         plt.show()
+
 
 class Pulsed_lidar(Radar):
     pass
@@ -170,7 +210,7 @@ class Coherent_lidar(Radar):
     pass
 
 
-class Target():
+class Target:
     """
     目标类，定义了目标相关参数
     """
@@ -185,6 +225,29 @@ class Target():
         self.distance = distance
         self.sigma = sigma
         self.RCS = 10 * np.log10(self.sigma)
+
+
+class TargetSet:
+    """
+    目标组
+    """
+
+    def __init__(self) -> None:
+        self.targets = []
+        self.distances = []
+        self.sigma = []
+        self.RCSS = 10 * np.log10(self.sigma)
+        
+        self.num = 0
+        
+    def add_Target(self, target):
+        """
+        添加目标
+
+        :param Target target: 需要添加的目标
+        """
+        self.targets.append(target)
+        self.num += 1
 
 
 def Maximum_coherent_accumulation_time_limit(lambda_, a_r):

@@ -33,7 +33,7 @@ def find_heighest_peak(sequence: list) -> tuple:
 
 def fig_font_size(func):
     """
-    设置 matplotlib 绘图样式的装饰器，只会进行样式的设置，并不会绘图。
+    设置 matplotlib 绘图样式的装饰器，只会进行样式的设置，并不会绘图。\n
     原理是进行全局设置样式。
 
     :param _type_ func: 被装饰函数
