@@ -1,14 +1,12 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 '''
-@File    :   double_relay.py
+@File    :   relay.py
 @Time    :   2023/07/25 17:21
 @Author  :   shun
 @Description  :   定义两个继电器
 '''
 
-if __name__ == '__main__':
-    pass
 import time
 import serial.tools.list_ports
 import serial.rs485
