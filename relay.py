@@ -7,8 +7,6 @@
 @Description  :   定义两个继电器
 '''
 
-
-
 if __name__ == '__main__':
     pass
 import time
@@ -27,6 +25,71 @@ def print_comport():
         print("可用串口设备：")
         for comport in ports_list:
             print(list(comport)[0], list(comport)[1])
+
+
+class SingleRelay(serial.rs485.RS485):
+    """
+    单路继电器 \n
+    继承 serial.rs485.RS485 
+
+    :param _type_ serial: _description_
+    """
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+        # 设置地址
+        self.set_addr()
+
+    def set_addr(self, addr="01"):
+        """
+        设置继电器地址
+        
+        """
+        self.addr = addr
+        self.set_addr_command = "FE " + self.addr + " FF"
+        self.relay_start_command = self.addr + " AA FF"
+        self.relay_stop_command = self.addr + " BB FF"
+        self.relay_flick_command = self.addr + " CC FF"
+
+        self.write(bytes.fromhex(self.set_addr_command))
+        time.sleep(0.1)
+
+    def switch(self):
+        """
+        判断串口是否打开
+        """
+        if self.isOpen():
+            print("串口打开成功。")
+            print("绑定串口名称：", double_relay.name)
+        else:
+            print("打开串口失败。")
+
+    def relay_start(self):
+        """
+        启动继电器
+        """
+        self.write(bytes.fromhex(self.relay_start_command))
+
+    def relay_stop(self):
+        """
+        关闭继电器
+        """
+        self.write(bytes.fromhex(self.relay_stop_command))
+
+    def relay_flick(self):
+        """
+        继电器点动
+        """
+        self.write(bytes.fromhex(self.relay_flick_command))
+
+    def read_addr(self):
+        """
+        读取继电器地址
+
+        :return _type_: 继电器地址
+        """
+        return self.addr
 
 
 class DoubleRelay(serial.rs485.RS485):
@@ -128,71 +191,6 @@ class DoubleRelay(serial.rs485.RS485):
         读取继电器地址
 
         :return _type_: 双路继电器地址
-        """
-        return self.addr
-
-
-class SingleRelay(serial.rs485.RS485):
-    """
-    单路继电器 \n
-    继承 serial.rs485.RS485 
-
-    :param _type_ serial: _description_
-    """
-
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-
-        # 设置地址
-        self.set_addr()
-
-    def set_addr(self, addr="01"):
-        """
-        设置继电器地址
-        
-        """
-        self.addr = addr
-        self.set_addr_command = "FE " + self.addr + " FF"
-        self.relay_start_command = self.addr + " AA FF"
-        self.relay_stop_command = self.addr + " BB FF"
-        self.relay_flick_command = self.addr + " CC FF"
-
-        self.write(bytes.fromhex(self.set_addr_command))
-        time.sleep(0.1)
-
-    def switch(self):
-        """
-        判断串口是否打开
-        """
-        if self.isOpen():
-            print("串口打开成功。")
-            print("绑定串口名称：", double_relay.name)
-        else:
-            print("打开串口失败。")
-
-    def relay_start(self):
-        """
-        启动继电器
-        """
-        self.write(bytes.fromhex(self.relay_start_command))
-
-    def relay_stop(self):
-        """
-        关闭继电器
-        """
-        self.write(bytes.fromhex(self.relay_stop_command))
-
-    def relay_flick(self):
-        """
-        继电器点动
-        """
-        self.write(bytes.fromhex(self.relay_flick_command))
-
-    def read_addr(self):
-        """
-        读取继电器地址
-
-        :return _type_: 继电器地址
         """
         return self.addr
 
