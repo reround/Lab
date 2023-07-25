@@ -33,11 +33,33 @@ class Pump(serial.rs485.RS485):
         self.speed = "00"
         self.flow = "00"
         
-        self.start_command = self.addr + " AA FF"
-        self.stop_command = self.addr + " BB FF"
         self.speed_command = ""
         self.flow_command = ""
-        self.full_speed_command = self.addr + " CC FF"
+    
+    def start(self):
+        """
+        启动蠕动泵
+        """
+        self.write(bytes.fromhex("01 06 00 04 00 01 09 CB"))
+        
+    def stop(self):
+        """
+        关闭蠕动泵
+        """
+        self.write(bytes.fromhex("01 06 00 04 00 00 C8 0B"))
+        
+    def full_speed(self):
+        """
+        全速运行
+        """
+        self.write(bytes.fromhex("01 06 00 04 00 02 49 CA"))
+    
+    def choose_speed(self, speed):
+        ...
+    
+    def choose_flow(self, flow):
+        ...
+    
 
 if __name__ == '__main__':
     pass
