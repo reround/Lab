@@ -39,10 +39,13 @@ class SingleRelay(serial.rs485.RS485):
         super().__init__(*args, **kwargs)
         self.wait_time = 0.1
 
-        # 设置地址
-        self.set_addr()
+        self.addr = "01"
+        self.set_addr_command = "FE " + self.addr + " FF"
+        self.relay_start_command = self.addr + " AA FF"
+        self.relay_stop_command = self.addr + " BB FF"
+        self.relay_flick_command = self.addr + " CC FF"
 
-    def set_addr(self, addr="01"):
+    def set_addr(self, addr):
         """
         设置继电器地址
         
@@ -105,10 +108,16 @@ class DoubleRelay(serial.rs485.RS485):
         super().__init__(*args, **kwargs)
         self.wait_time = 0.1
         
-        # 设置地址
-        self.set_addr()
+        self.addr = "01"
+        self.set_addr_command = "FE " + self.addr + " FF"
+        self.relay_1_start_command = self.addr + " AA FF"
+        self.relay_1_stop_command = self.addr + " BB FF"
+        self.relay_1_flick_command = self.addr + " CC FF"
+        self.relay_2_start_command = self.addr + " DD FF"
+        self.relay_2_stop_command = self.addr + " EE FF"
+        self.relay_2_flick_command = self.addr + " FF FF"
 
-    def set_addr(self, addr="01"):
+    def set_addr(self, addr):
         """
         设置双路继电器地址
         
@@ -200,7 +209,7 @@ class DoubleRelay(serial.rs485.RS485):
 if __name__ == "__main__":
 
     try:
-        double_relay = DoubleRelay(port="COM3",
+        double_relay = DoubleRelay(port="COM2",
                                    baudrate=9600,
                                    bytesize=serial.EIGHTBITS,
                                    parity=serial.PARITY_NONE,
