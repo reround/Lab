@@ -1,3 +1,16 @@
+#!/usr/bin/env python
+# -*- encoding: utf-8 -*-
+'''
+@File    :   double_relay.py
+@Time    :   2023/07/25 17:21
+@Author  :   shun
+@Description  :   定义两个继电器
+'''
+
+
+
+if __name__ == '__main__':
+    pass
 import time
 import serial.tools.list_ports
 import serial.rs485
@@ -44,6 +57,9 @@ class DoubleRelay(serial.rs485.RS485):
         self.relay_2_stop_command = self.addr + " EE FF"
         self.relay_2_flick_command = self.addr + " FF FF"
 
+        self.write(bytes.fromhex(self.set_addr_command))
+        time.sleep(0.1)
+
     def switch(self):
         """
         判断串口是否打开
@@ -59,6 +75,7 @@ class DoubleRelay(serial.rs485.RS485):
         启动一号继电器
         """
         self.write(bytes.fromhex(self.relay_1_start_command))
+        print(self.relay_1_start_command)
 
     def relay_1_stop(self):
         """
@@ -95,6 +112,7 @@ class DoubleRelay(serial.rs485.RS485):
         启动所有继电器
         """
         self.relay_1_start()
+        time.sleep(0.1)
         self.relay_2_start()
 
     def all_stop(self):
@@ -102,14 +120,8 @@ class DoubleRelay(serial.rs485.RS485):
         关闭所有继电器
         """
         self.relay_1_stop()
+        time.sleep(0.1)
         self.relay_2_stop()
-        
-    def all_flick(self):
-        """
-        所有继电器点动
-        """
-        self.relay_1_flick()
-        self.relay_2_flick()
 
     def read_addr(self):
         """
@@ -144,6 +156,9 @@ class SingleRelay(serial.rs485.RS485):
         self.relay_start_command = self.addr + " AA FF"
         self.relay_stop_command = self.addr + " BB FF"
         self.relay_flick_command = self.addr + " CC FF"
+
+        self.write(bytes.fromhex(self.set_addr_command))
+        time.sleep(0.1)
 
     def switch(self):
         """
@@ -185,7 +200,7 @@ class SingleRelay(serial.rs485.RS485):
 if __name__ == "__main__":
 
     try:
-        double_relay = DoubleRelay(port="COM2",
+        double_relay = DoubleRelay(port="COM3",
                                    baudrate=9600,
                                    bytesize=serial.EIGHTBITS,
                                    parity=serial.PARITY_NONE,
@@ -195,8 +210,12 @@ if __name__ == "__main__":
         print(e)
     else:
         double_relay.switch()
-        double_relay.set_addr(addr="02")
-        double_relay.relay_1_stop()
+        # double_relay.set_addr(addr="02")
+
+        # double_relay.relay_start()
+        double_relay.relay_1_flick()
+        # double_relay.relay_1_start()
+        # double_relay.relay_1_stop()
         pass
     finally:
         time.sleep(0.1)
