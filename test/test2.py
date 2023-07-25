@@ -1,6 +1,5 @@
 # import serial
 import time
-import charset_normalizer
 import serial.tools.list_ports
 import serial.rs485
 import serial
