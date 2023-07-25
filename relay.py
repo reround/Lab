@@ -37,6 +37,7 @@ class SingleRelay(serial.rs485.RS485):
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
+        self.wait_time = 0.1
 
         # 设置地址
         self.set_addr()
@@ -53,7 +54,7 @@ class SingleRelay(serial.rs485.RS485):
         self.relay_flick_command = self.addr + " CC FF"
 
         self.write(bytes.fromhex(self.set_addr_command))
-        time.sleep(0.1)
+        time.sleep(self.wait_time)
 
     def switch(self):
         """
@@ -102,7 +103,8 @@ class DoubleRelay(serial.rs485.RS485):
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-
+        self.wait_time = 0.1
+        
         # 设置地址
         self.set_addr()
 
@@ -121,7 +123,7 @@ class DoubleRelay(serial.rs485.RS485):
         self.relay_2_flick_command = self.addr + " FF FF"
 
         self.write(bytes.fromhex(self.set_addr_command))
-        time.sleep(0.1)
+        time.sleep(self.wait_time)
 
     def switch(self):
         """
@@ -175,7 +177,7 @@ class DoubleRelay(serial.rs485.RS485):
         启动所有继电器
         """
         self.relay_1_start()
-        time.sleep(0.1)
+        time.sleep(self.wait_time)
         self.relay_2_start()
 
     def all_stop(self):
@@ -183,7 +185,7 @@ class DoubleRelay(serial.rs485.RS485):
         关闭所有继电器
         """
         self.relay_1_stop()
-        time.sleep(0.1)
+        time.sleep(self.wait_time)
         self.relay_2_stop()
 
     def read_addr(self):
