@@ -4,7 +4,7 @@
 @File    :   apparatus.py
 @Time    :   2023/07/25 17:21
 @Author  :   shun
-@Description  :   定义两个继电器
+@Description  :   TODO
 '''
 
 import time
