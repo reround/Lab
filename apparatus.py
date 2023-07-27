@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 '''
-@File    :   relay.py
+@File    :   apparatus.py
 @Time    :   2023/07/25 17:21
 @Author  :   shun
 @Description  :   定义两个继电器
@@ -63,7 +63,7 @@ class SingleRelay(serial.rs485.RS485):
         """
         if self.isOpen():
             print("串口打开成功。")
-            print("绑定串口名称：", double_relay.name)
+            print("绑定串口名称：", self.name)
         else:
             print("打开串口失败。")
 
@@ -105,7 +105,7 @@ class DoubleRelay(serial.rs485.RS485):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.wait_time = 0.1
-        
+
         self.addr = "01"
         self.set_addr_command = "FE " + self.addr + " FF"
         self.relay_1_start_command = self.addr + " AA FF"
@@ -138,7 +138,7 @@ class DoubleRelay(serial.rs485.RS485):
         """
         if self.isOpen():
             print("串口打开成功。")
-            print("绑定串口名称：", double_relay.name)
+            print("绑定串口名称：", self.name)
         else:
             print("打开串口失败。")
 
@@ -147,7 +147,6 @@ class DoubleRelay(serial.rs485.RS485):
         启动一号继电器
         """
         self.write(bytes.fromhex(self.relay_1_start_command))
-        print(self.relay_1_start_command)
 
     def relay_1_stop(self):
         """
@@ -204,28 +203,73 @@ class DoubleRelay(serial.rs485.RS485):
         return self.addr
 
 
+class Pump(serial.rs485.RS485):
+    """
+    蠕动泵 \n
+    继承 serial.rs485.RS485 
+
+    :param _type_ serial: _description_
+    
+    1. 转速设定：01 06 00 01 13 88 D5 5C   设定转速为:50RPM.
+    2. 启动：01 06 00 04 00 01 09 CB
+    3. 停止：01 06 00 04 00 00 C8 0B
+    4. 全速：01 06 00 04 00 02 49 CA
+    5. 流量设定：01 10 00 02 00 02 04 02 25 51 00 5F 95   设定流量为：36ml/min
+
+    """
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.wait_time = 0.1
+
+        self.addr = "01"
+        self.speed = "00"
+        self.flow = "00"
+
+        self.speed_command = ""
+        self.flow_command = ""
+
+    def start(self):
+        """
+        启动蠕动泵
+        """
+        self.write(bytes.fromhex("01 06 00 04 10 00 C5 CB"))
+
+    def stop(self):
+        """
+        关闭蠕动泵
+        """
+        self.write(bytes.fromhex("01 06 00 04 00 00 C8 0B"))
+
+    def full_speed(self):
+        """
+        全速运行
+        """
+        self.write(bytes.fromhex("01 06 00 04 00 02 49 CA"))
+
+    def choose_speed(self, speed):
+        """
+        选择速度，单位是 RPM, 分辨率 0.01 \n
+        范围 0.01 RPM - 100 RPM
+
+        :param _type_ speed: _description_
+        """
+        speed = str(hex(speed * 100))[2:].rjust(4, "0")
+        speed = "01 06 00 01 " + speed + "D5 5C"
+        self.write(bytes.fromhex(speed))
+
+    def choose_flow(self, flow):
+        """
+        选择流量，单位是 ml/min
+
+        :param _type_ flow: _description_
+        """
+        flow = str(hex(flow * 1000000))[2:].rjust(8, "0")
+        flow = "01 10 00 02 00 02 04 " + flow + " 5F 95"
+        self.write(bytes.fromhex(flow))
+
+
 if __name__ == "__main__":
 
-    try:
-        double_relay = DoubleRelay(port="COM2",
-                                   baudrate=9600,
-                                   bytesize=serial.EIGHTBITS,
-                                   parity=serial.PARITY_NONE,
-                                   stopbits=serial.STOPBITS_TWO,
-                                   timeout=0.5)
-    except Exception as e:
-        print(e)
-    else:
-        double_relay.switch()
-        # double_relay.set_addr(addr="02")
-
-        # double_relay.relay_start()
-        double_relay.relay_1_flick()
-        # double_relay.relay_1_start()
-        # double_relay.relay_1_stop()
-        pass
-    finally:
-        time.sleep(0.1)
-        double_relay.close()
-
+    ...
     # print_comport()

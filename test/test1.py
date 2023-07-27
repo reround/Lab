@@ -6,24 +6,56 @@
 @Author  :   shun
 @Description  :   用于测试
 '''
-import numpy as np
-import matplotlib.pyplot as plt
-from tek import Tek
 
-# tek = Tek("D:/物理192 201711020222 张雨顺/shiyan/TEK0068.CSV")
+import time
 
-# t, s = tek.read_data()
+import serial
+from apparatus import DoubleRelay, Pump
 
-# f = np.fft.fft(s)
-# plt.subplot(211)
-# plt.plot(abs(f))
-# plt.subplot(212)
-# plt.plot(t, s)
-# plt.show()
-a=np.linspace(0, 2, 3)
-b=np.linspace(0, 2, 3)
-# a=a[::-1]
-print(np.hstack([a,b]))
+
+pump = Pump(port="COM3",
+            baudrate=9600,
+            bytesize=serial.EIGHTBITS,
+            parity=serial.PARITY_NONE,
+            stopbits=serial.STOPBITS_TWO,
+            timeout=0.5)
+pump.choose_speed(50)
+time.sleep(0.1)
+pump.close()
 
 if __name__ == '__main__':
-    pass
+    relay = DoubleRelay(port="COM2",
+                        baudrate=9600,
+                        bytesize=serial.EIGHTBITS,
+                        parity=serial.PARITY_NONE,
+                        stopbits=serial.STOPBITS_TWO,
+                        timeout=0.5)
+    func = {
+        "1": relay.relay_1_start,
+        "2": relay.relay_1_stop,
+        "3": relay.relay_1_flick,
+        "4": relay.relay_2_start,
+        "5": relay.relay_2_stop,
+        "6": relay.relay_2_flick,
+        "7": relay.all_start,
+        "8": relay.all_stop,
+        "9": exit
+    }
+
+    while True:
+        print("""
+            "1": relay.relay_1_start,
+            "2": relay.relay_1_stop,
+            "3": relay.relay_1_flick,
+            "4": relay.relay_2_start,
+            "5": relay.relay_2_stop,
+            "6": relay.relay_2_flick,
+            "7": relay.all_start,
+            "8": relay.all_stop,
+            "9": exit
+            """)
+        opt = input("::>")
+        if opt in func.keys():
+            func[opt]()
+        else:
+            print("no opt")
