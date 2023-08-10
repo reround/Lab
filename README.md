@@ -1,7 +1,7 @@
 
 # 1 概述
 
-包含一个函数，三个类
+包含一个函数，四个类
 
 > 在一些数值范围判断出会抛出异常，注意处理
 
@@ -9,11 +9,15 @@
 > print_comport 打印串口信息
 
 
-> 三个类
+> 四个类
 > SingleRelay   单路继电器
 > DoubleRelay   双路继电器
 > Pump          蠕动泵
 > > pump 中涉及到方向的方法是根据其 direction 属性决定的，因此要让设备按照预想的结果运作（防止按键更改方向），需要先更改 direction 的值（ CLOCK 或 ANTICLOCK ），默认为 CLOCK
+> Camera        工业相机
+> > Camera 的操作 ：
+> > "esc"   退出
+> > "k"     拍摄
 
 
 # 2 创建
@@ -284,5 +288,51 @@ class Pump(serial.rs485.RS485):
         获取当前地址，循环验证，需要等待。。。
 
         :return int: int 类型地址
+        """
+```
+
+## Camera
+
+```python
+
+class Camera:
+    """
+    basler 工业相机
+    """
+        # 保存图片的文件夹， 默认为入口目录
+        self.save_path
+        # 保存图片的序号，重启程序后从零开始
+        self.id : int
+        # 图片序号的长度
+        self.id_len
+        # 保存图片名称
+        self.filename
+
+    def set_save_path(self, new_path: str):
+        """
+        设置保存图片的文件夹，可以用来在达到文件夹存储上限时更换存储路径
+
+        :param str new_path: 新的保存路径
+        """
+    def set_id(self, new_id: int):
+        """
+        设置保存图片时新的序号，可以用来在达到序号上限时重置序号。 \n
+        重置 id 时可以使用 : set_id(0)
+
+        :param int new_id: 新的序号 id
+        """
+    def shot(self) -> bool:
+        """
+        拍摄图片，保存到 filename
+        """
+    def key_opt(self):
+        """
+        键盘操作函数，用来控制拍照和退出 \n
+        "esc"   退出 \n
+        "k"     拍摄 \n
+        """
+    def record(self):
+        """
+        录制并实时显示
         """
 ```
