@@ -7,12 +7,15 @@
 @Description  :   TODO
 '''
 
+import sys
 import time
-
+import os
+from functools import reduce
+import configparser
 import serial.tools.list_ports
 import serial.rs485
-
-from functools import reduce
+from pypylon import pylon
+import cv2
 
 
 def print_comport():
@@ -652,7 +655,7 @@ class Pump(serial.rs485.RS485):
         :return int: int 类型地址
         """
         for i in range(1, 31):
-            if pump.verify_addr(i):
+            if self.verify_addr(i):
                 return i
 
     # TODO 还未实现
@@ -666,31 +669,109 @@ class Pump(serial.rs485.RS485):
         return self.direction
 
 
+class Camera:
+    """
+    basler 工业相机
+    """
+
+    def __init__(self) -> None:
+        # 保存图片的文件夹， 默认为入口目录
+        BASE_DIR = os.path.dirname(os.path.realpath(sys.argv[0]))
+        self.save_path = os.path.join(BASE_DIR, "imgs")
+        if not os.path.exists(self.save_path):
+            os.makedirs(self.save_path)
+        # 保存图片的序号，重启程序后从零开始
+        self.id = 0
+        # 图片序号的长度
+        self.id_len = 3
+        # 保存图片名称
+        self.filename = None
+        self.update_filename()
+        # 保存图像信息的变量
+        self.img = None
+
+        #----------------------------------------------------------------------
+        # 连接到第一个可用的摄像头
+        self.camera = pylon.InstantCamera(
+            pylon.TlFactory.GetInstance().CreateFirstDevice())
+        # 以最小的延迟连续抓取(视频)
+        self.camera.StartGrabbing(pylon.GrabStrategy_LatestImageOnly)
+        self.converter = pylon.ImageFormatConverter()
+        # 转换为 opencv bgr 格式
+        self.converter.OutputPixelFormat = pylon.PixelType_BGR8packed
+        self.converter.OutputBitAlignment = pylon.OutputBitAlignment_MsbAligned
+
+    def set_save_path(self, new_path: str):
+        """
+        设置保存图片的文件夹，可以用来在达到文件夹存储上限时更换存储路径
+
+        :param str new_path: 新的保存路径
+        """
+        self.save_path = new_path
+        if not os.path.exists(self.save_path):
+            os.makedirs(self.save_path)
+
+    def set_id(self, new_id: int):
+        """
+        设置保存图片时新的序号，可以用来在达到序号上限时重置序号。 \n
+        重置 id 时可以使用 : set_id(0)
+
+        :param int new_id: 新的序号 id
+        """
+        self.id = new_id
+        self.update_filename()
+
+    def update_filename(self):
+        """
+        更新保存图片名称
+        """
+        self.filename = str(self.id).rjust(self.id_len, '0') + '.png'
+
+    def shot(self) -> bool:
+        """
+        拍摄图片，保存到 filename
+
+        :return bool: bool
+        """
+        if cv2.imwrite(os.path.join(self.save_path, self.filename), self.img):
+            self.id += 1
+            self.update_filename()
+            return True
+        return False
+
+    def key_opt(self):
+        """
+        键盘操作函数，用来控制拍照和退出 \n
+        "esc"   退出 \n
+        "k"     拍摄 \n
+        """
+        # 等待按键
+        key = cv2.waitKey(1)
+        if key == 27:
+            # 释放资源
+            self.camera.StopGrabbing()
+            cv2.destroyAllWindows()
+        elif key == 107:
+            self.shot()
+
+    def record(self):
+        """
+        录制并实时显示
+        """
+        while self.camera.IsGrabbing():
+            grabResult = self.camera.RetrieveResult(
+                1000, pylon.TimeoutHandling_ThrowException)
+
+            if grabResult.GrabSucceeded():
+                # 访问图像数据
+                image = self.converter.Convert(grabResult)
+                self.img = image.GetArray()
+                cv2.namedWindow('title', cv2.WINDOW_NORMAL)
+                cv2.imshow('title', self.img)
+            self.key_opt()
+            grabResult.Release()
+        
+
+
 if __name__ == "__main__":
-    print_comport()
-    pump = Pump(port="COM4")
-
-    pump.switch()
-    pump.addr = "02"
-
-    # pump.direction = pump.CLOCK
-    # pump.direction = pump.ANTICLOCK
-    # pump.set_speed(11.2)
-    # print(pump.get_speed())
-    print("ssssssssssss", pump.get_speed())
-    print("ffffffffff", pump.get_flow())
-    print("real_dir", pump.get_direction)
-
-    time.sleep(1)
-    pump.turn()
-
-    # pump.set_speed(11.2)
-    print("ssssssssssss", pump.get_speed())
-    print("ffffffffff", pump.get_flow())
-    print("real_dir", pump.get_direction)
-
-    # # pump.full()
-    time.sleep(1)
-    pump.stop()
-
-    pump.close()
+    pass
