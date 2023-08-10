@@ -6,16 +6,18 @@
 > 在一些数值范围判断出会抛出异常，注意处理
 
 > 一个函数
+>
 > print_comport 打印串口信息
 
-
 > 四个类
+> 
 > SingleRelay   单路继电器
+> 
 > DoubleRelay   双路继电器
+> 
 > Pump          蠕动泵
 > > pump 中涉及到方向的方法是根据其 direction 属性决定的，因此要让设备按照预想的结果运作（防止按键更改方向），需要先更改 direction 的值（ CLOCK 或 ANTICLOCK ），默认为 CLOCK
-
-
+> 
 > Camera        工业相机
 > > Camera 的操作 ：
 > > "esc"   退出
