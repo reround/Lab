@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from experiment import Radar, Target
+from radar.experiment import Radar, Target
 
 radar = Radar(B=200.0e6, theta_a=3, T_sc=8)
 # dis = np.arange(10, 100, 10)
